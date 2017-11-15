@@ -1,0 +1,31 @@
+@import "bootstrap-sprockets";
+@import "bootstrap";
+
+/* mixins, variables, etc. */
+
+$navbar-space: 50px;
+
+/* global */
+
+body {
+	padding-top: $navbar-space;
+}
+
+/* main map */
+
+.map {
+	height: 100%;
+	left: 0;
+	margin-top: $navbar-space;
+	overflow: hidden;
+	position: absolute;
+	top: 0;
+	width: 100%;
+}
+
+#map {
+	bottom: 0;
+	position: absolute;
+	top: 0;
+	width: 100%;
+}

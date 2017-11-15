@@ -1,0 +1,37 @@
+<script src='https://api.tiles.mapbox.com/mapbox-gl-js/v0.42.0/mapbox-gl.js'></script>
+<script src='https://api.mapbox.com/mapbox-gl-js/plugins/mapbox-gl-draw/v1.0.0/mapbox-gl-draw.js'></script>
+<link href='https://api.tiles.mapbox.com/mapbox-gl-js/v0.42.0/mapbox-gl.css' rel='stylesheet' />
+<link rel='stylesheet' href='https://api.mapbox.com/mapbox-gl-js/plugins/mapbox-gl-draw/v1.0.0/mapbox-gl-draw.css' type='text/css'/>
+
+<div class="map">
+	<div id='map'></div>
+</div>
+
+<script>
+	mapboxgl.accessToken = 'pk.eyJ1IjoiaHVtYXN0YSIsImEiOiJjajl5cHFkdmM4N2xjMndsZ2t5ZDJtOXBkIn0.ISnZJwNy340haV8n5t3wdg';
+	var map = new mapboxgl.Map({
+	    container: 'map',
+	    style: 'mapbox://styles/humasta/cj9yzxd3o841q2so2eq1u2x1j',
+	    center: [-96, 37.8], // starting position
+    	zoom: 3 // starting zoom
+	});
+
+	// Add geolocate control to the map
+	map.addControl(new mapboxgl.GeolocateControl({
+		positionOptions: {
+			enableHighAccuracy: true
+		},
+		trackUserLocation: true
+	}));
+
+	// Add tool to draw polygons
+	var draw = new MapboxDraw({
+    displayControlsDefault: false,
+    controls: {
+	    polygon: true,
+	    trash: true
+    }
+	});
+	map.addControl(draw);
+
+</script>
