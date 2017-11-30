@@ -12,8 +12,8 @@
 	var map = new mapboxgl.Map({
 	    container: 'map',
 	    style: 'mapbox://styles/humasta/cj9yzxd3o841q2so2eq1u2x1j',
-	    center: [-96, 37.8], // starting position
-    	zoom: 3 // starting zoom
+	    center: [-76.48, 42.44], // starting position
+    	zoom: 13 // starting zoom
 	});
 
 	// Add geolocate control to the map
@@ -33,5 +33,34 @@
     }
 	});
 	map.addControl(draw);
+
+	map.on('click', function(e) {
+		var features = map.queryRenderedFeatures(e.point, {
+			layers: ['cat-colony-locations']
+		});
+
+		if (!features.length) {
+			return;
+		}
+
+		var feature = features[0];
+		console.log(feature);
+
+		var popup = new mapboxgl.Popup()
+			.setLngLat(e.lngLat)
+			.setHTML('<h3>' + feature.properties.creator + '</h3><p>' +
+				feature.properties['last updated'] + '</p>')
+			.setLngLat(e.lngLat)
+			.addTo(map);
+
+	});	
+
+	map.on('mouseenter', 'cat-colony-locations', function() {
+		map.getCanvas().style.cursor = 'pointer';
+	});
+
+	map.on('mouseleave', 'cat-colony-locations', function() {
+		map.getCanvas().style.cursor = '';
+	});
 
 </script>
