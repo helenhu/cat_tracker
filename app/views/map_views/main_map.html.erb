@@ -34,6 +34,7 @@
 	});
 	map.addControl(draw);
 
+	// On click, display properties of feature in 'cat-colony-locations' layer.
 	map.on('click', function(e) {
 		var features = map.queryRenderedFeatures(e.point, {
 			layers: ['cat-colony-locations']
@@ -55,10 +56,10 @@
 
 	});	
 
+	// Show pointer cursor when mousing over features in cat-colony-locations layer.
 	map.on('mouseenter', 'cat-colony-locations', function() {
 		map.getCanvas().style.cursor = 'pointer';
 	});
-
 	map.on('mouseleave', 'cat-colony-locations', function() {
 		map.getCanvas().style.cursor = '';
 	});
