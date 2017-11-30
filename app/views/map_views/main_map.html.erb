@@ -1,10 +1,3 @@
-<script src='https://api.tiles.mapbox.com/mapbox-gl-js/v0.42.0/mapbox-gl.js'></script>
-<script src='https://api.mapbox.com/mapbox-gl-js/plugins/mapbox-gl-draw/v1.0.0/mapbox-gl-draw.js'></script>
-<script src='https://api.tiles.mapbox.com/mapbox.js/plugins/turf/v3.0.11/turf.min.js'></script>
-<script src='http://js.zapjs.com/js/download.js'></script>
-<link href='https://api.tiles.mapbox.com/mapbox-gl-js/v0.42.0/mapbox-gl.css' rel='stylesheet' />
-<link rel='stylesheet' href='https://api.mapbox.com/mapbox-gl-js/plugins/mapbox-gl-draw/v1.0.0/mapbox-gl-draw.css' type='text/css'/>
-
 <div class="map">
 	<div id='map'></div>
 </div>
@@ -49,14 +42,8 @@
 		}
 
 		var feature = features[0];
-		var centroid = turf.centroid(feature.geometry);
 
-		var popup = new mapboxgl.Popup()
-			.setLngLat(centroid.geometry.coordinates)
-			.setHTML('<h3>' + feature.properties.creator + '</h3><p>' +
-				feature.properties['last updated'] + '</p>')
-			.setLngLat(centroid.geometry.coordinates)
-			.addTo(map);
+		createPopUp('existing', feature);
 	});	
 
 	// Show pointer cursor when mousing over features in cat-colony-locations layer.
@@ -70,10 +57,13 @@
 
 	map.on('click', function(e) {
 		var drawnFeatures = draw.getFeatureIdsAt(e.point);
-		if (!drawnFeatures.length) {
+		if (!drawnFeatures.length || draw.getMode()!='simple_select') {
 			return;
 		}
-		console.log(draw.getFeatureIdsAt(e.point));
+		var featureId = drawnFeatures[0] || drawnFeatures[1];
+		var feature = draw.get(featureId);
+
+		createPopUp('new', feature);
 	});
 
 	document.getElementById('save-btn').onclick = function(e) {
@@ -89,6 +79,24 @@
 		}
 		var json = JSON.stringify({"features": features});
 		download(json, "new_colonies.geojson", "text/plain");
+	}
+
+	function createPopUp(type, feature) {
+		var centroid = turf.centroid(feature.geometry);
+		var popupText = '';
+
+		if (type == 'existing') {
+			popupText = '<h3>' + feature.properties.creator + '</h3><p>' +
+				feature.properties['last updated'] + '</p>';
+		} else if (type == 'new') {
+			popupText = 'New feature';
+		}
+
+		var popup = new mapboxgl.Popup()
+			.setLngLat(centroid.geometry.coordinates)
+			.setHTML(popupText)
+			.setLngLat(centroid.geometry.coordinates)
+			.addTo(map);
 	}
 
 
