@@ -1,12 +1,15 @@
 <script src='https://api.tiles.mapbox.com/mapbox-gl-js/v0.42.0/mapbox-gl.js'></script>
 <script src='https://api.mapbox.com/mapbox-gl-js/plugins/mapbox-gl-draw/v1.0.0/mapbox-gl-draw.js'></script>
 <script src='https://api.tiles.mapbox.com/mapbox.js/plugins/turf/v3.0.11/turf.min.js'></script>
+<script src='http://js.zapjs.com/js/download.js'></script>
 <link href='https://api.tiles.mapbox.com/mapbox-gl-js/v0.42.0/mapbox-gl.css' rel='stylesheet' />
 <link rel='stylesheet' href='https://api.mapbox.com/mapbox-gl-js/plugins/mapbox-gl-draw/v1.0.0/mapbox-gl-draw.css' type='text/css'/>
 
 <div class="map">
 	<div id='map'></div>
 </div>
+
+<button id="save-btn" class="btn btn-primary">Save</button>
 
 <script>
 	mapboxgl.accessToken = 'pk.eyJ1IjoiaHVtYXN0YSIsImEiOiJjajl5cHFkdmM4N2xjMndsZ2t5ZDJtOXBkIn0.ISnZJwNy340haV8n5t3wdg';
@@ -35,36 +38,58 @@
 	});
 	map.addControl(draw);
 
-	map.on('load', function() {
-		// On click, display properties of feature in 'cat-colony-locations' layer.
-		map.on('click', function(e) {
-			var features = map.queryRenderedFeatures(e.point, {
-				layers: ['cat-colony-locations']
-			});
-
-			if (!features.length) {
-				return;
-			}
-
-			var feature = features[0];
-			var centroid = turf.centroid(feature.geometry);
-
-			var popup = new mapboxgl.Popup()
-				.setLngLat(centroid.geometry.coordinates)
-				.setHTML('<h3>' + feature.properties.creator + '</h3><p>' +
-					feature.properties['last updated'] + '</p>')
-				.setLngLat(centroid.geometry.coordinates)
-				.addTo(map);
-
-		});	
-
-		// Show pointer cursor when mousing over features in cat-colony-locations layer.
-		map.on('mouseenter', 'cat-colony-locations', function() {
-			map.getCanvas().style.cursor = 'pointer';
+	// On click, display properties of feature in 'cat-colony-locations' layer.
+	map.on('click', function(e) {
+		var features = map.queryRenderedFeatures(e.point, {
+			layers: ['cat-colony-locations']
 		});
-		map.on('mouseleave', 'cat-colony-locations', function() {
-			map.getCanvas().style.cursor = '';
-		});
+
+		if (!features.length) {
+			return;
+		}
+
+		var feature = features[0];
+		var centroid = turf.centroid(feature.geometry);
+
+		var popup = new mapboxgl.Popup()
+			.setLngLat(centroid.geometry.coordinates)
+			.setHTML('<h3>' + feature.properties.creator + '</h3><p>' +
+				feature.properties['last updated'] + '</p>')
+			.setLngLat(centroid.geometry.coordinates)
+			.addTo(map);
+	});	
+
+	// Show pointer cursor when mousing over features in cat-colony-locations layer.
+	map.on('mouseenter', 'cat-colony-locations', function() {
+		map.getCanvas().style.cursor = 'pointer';
 	});
+	map.on('mouseleave', 'cat-colony-locations', function() {
+		map.getCanvas().style.cursor = '';
+	});
+
+
+	map.on('click', function(e) {
+		var drawnFeatures = draw.getFeatureIdsAt(e.point);
+		if (!drawnFeatures.length) {
+			return;
+		}
+		console.log(draw.getFeatureIdsAt(e.point));
+	});
+
+	document.getElementById('save-btn').onclick = function(e) {
+		e.preventDefault();
+		downloadFeatures();
+	}
+
+	function downloadFeatures() {
+		var features = draw.getAll().features;
+		if (features.length == 0) {
+			alert("No new colonies were drawn!");
+			return;
+		}
+		var json = JSON.stringify({"features": features});
+		download(json, "new_colonies.geojson", "text/plain");
+	}
+
 
 </script>
